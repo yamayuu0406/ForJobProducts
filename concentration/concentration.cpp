@@ -44,6 +44,7 @@ int Handleset(int font){
     }
     return TitleFontHandle;
 }
+
 //画像データセット
 int picHandleset(int kind,int num){
 
@@ -109,9 +110,9 @@ int picHandleset(int kind,int num){
     static int backHandle = LoadGraph("cards/card_back.png");
     
     //画像呼び出し
-    if(kind == 0){  //裏面
+    if(kind == 4){  //裏面
         return backHandle;
-    } else if(kind == 1) {   //クラブ
+    } else if(kind == 0) {   //クラブ
         switch(num){
                 case 1:
                     return clubHandle1;
@@ -153,7 +154,7 @@ int picHandleset(int kind,int num){
                     return clubHandle13;
                     break;
             }
-    } else if(kind == 2){   //ダイアモンド
+    } else if(kind == 1){   //ダイアモンド
         switch(num){
                 case 1:
                     return diaHandle1;
@@ -195,7 +196,7 @@ int picHandleset(int kind,int num){
                     return diaHandle13;
                     break;
             }
-    } else if(kind == 3){   //ハート  
+    } else if(kind == 2){   //ハート  
         switch(num){
                 case 1:
                     return heartHandle1;
@@ -237,7 +238,7 @@ int picHandleset(int kind,int num){
                     return heartHandle13;
                     break;
             }
-    } else if(kind == 4){    //スペード
+    } else if(kind == 3){    //スペード
         switch(num){
                 case 1:
                     return spadeHandle1;
@@ -320,22 +321,61 @@ void HowToPlayScene(){
 }
 
 //ゲーム初期設定
+void GameInit(int setcard[4][13]){
+    int card[53] = {0};   //0は置かれていないカード 1は置かれたカード
 
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 13; j++){
+            do{
+                setcard[i][j] = rand()%52+1;//1～52が入る
+            }while(card[setcard[i][j]] != 0);
+            card[setcard[i][j]] = 1;
+        }
+    }
+}
 //ゲーム進行
 
 //ゲーム画面
 int GameScene(){
+
+    //カードを設定する 
+    int setcard[4][13] = {0};  //1～53の数字が入る
+    int setcardkind = 0;    //置かれたカードの種類
+    int setcardnum = 0;     //置かれたカードの数字
+
     //初期配置
     while(CheckHitKey( KEY_INPUT_ESCAPE)  == 0 ){
         for(int i = 0; i < 4; i++){
             for(int j = 0; j < 13; j++){
-            DrawGraph(CARDWID*j+42.5,CARDLEN*i+CARDLEN,picHandleset(0,0),false);
+            DrawGraph(CARDWID*j+42.5,CARDLEN*i+CARDLEN,picHandleset(4,0),false);
             }
         }
     }
 
-    //クリックでカードを開く
+    //ゲーム初期設定
+    GameInit(setcard); 
 
+    /*デバッグ
+    //カードを全て裏返す    
+    WaitTimer(2000);
+    ClearDrawScreen();
+
+    while(CheckHitKey( KEY_INPUT_SPACE )  == 0 ){
+        for(int i = 0; i < 4; i++){
+            for(int j = 0; j < 13; j++){
+                setcardkind = (setcard[i][j]-1) / 13;   //1～13が０でクラブ 14～26が１でダイア・・・
+                setcardnum = setcard[i][j] % 13 + 1 ;    //ダイアのAなら14-13で１が出る
+                DrawGraph(CARDWID*j+42.5,CARDLEN*i+CARDLEN,picHandleset(setcardkind,setcardnum),false);
+                //DrawFormatString( 300*i, 40 * j, GetColor(255,255,255), "setcardnum=%d", setcardnum );
+
+            }
+
+        }
+    }
+    デバッグ*/
+
+    //クリックでカードを開く
+    
     //二枚目も開く
 
     //同じだったら消える
@@ -348,7 +388,7 @@ int GameScene(){
     return 0;
 }
 
-Void ClearScene(){
+void ClearScene(){
     //クリア画面
 }
 
@@ -375,7 +415,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
         result = GameScene();
     }
 
-    if(result) ClearScene():
+    if(result) ClearScene();
 
 	WaitKey() ;				// キー入力待ち
     
