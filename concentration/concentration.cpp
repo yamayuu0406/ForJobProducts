@@ -19,6 +19,8 @@ int Dxlib_Start(){
     ChangeWindowMode( true );
     //文字コードを設定
     SetUseCharCodeFormat(DX_CHARCODEFORMAT_UTF8);
+    //マウス可視化設定
+    SetMouseDispFlag( TRUE ) ;
 
     // ＤＸライブラリ初期化処理
     if( DxLib_Init() == -1 ){
@@ -342,9 +344,10 @@ int GameScene(){
     int setcard[4][13] = {0};  //1～53の数字が入る
     int setcardkind = 0;    //置かれたカードの種類
     int setcardnum = 0;     //置かれたカードの数字
+    int MouseX,MouseY;  //マウスの座標
 
     //初期配置
-    while(CheckHitKey( KEY_INPUT_ESCAPE)  == 0 ){
+    while(CheckHitKey( KEY_INPUT_SPACE)  == 0 ){
         for(int i = 0; i < 4; i++){
             for(int j = 0; j < 13; j++){
             DrawGraph(CARDWID*j+42.5,CARDLEN*i+CARDLEN,picHandleset(4,0),false);
@@ -355,7 +358,7 @@ int GameScene(){
     //ゲーム初期設定
     GameInit(setcard); 
 
-    /*デバッグ
+/*デバッグ
     //カードを全て裏返す    
     WaitTimer(2000);
     ClearDrawScreen();
@@ -372,10 +375,12 @@ int GameScene(){
 
         }
     }
-    デバッグ*/
+デバッグ*/
 
     //クリックでカードを開く
-    
+    //マウスの位置を取得
+    GetMousePoint( &MouseX , &MouseY );
+
     //二枚目も開く
 
     //同じだったら消える
