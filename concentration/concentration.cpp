@@ -423,7 +423,7 @@ int GameScene(){
                 opencard = 1;
             }
             //二枚目も開く
-            if( ( MouseInput & MOUSE_INPUT_RIGHT ) != 0 && opencard == 1){
+            if( ( MouseInput & MOUSE_INPUT_RIGHT ) != 0 && opencard == 1 && !((cardX==card1X)&&(cardY==card1Y)) ){
                 DrawGraph(CARDWID*cardX+CARDFIRST,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
                 card2num = setcardnum;
                 card2X = cardX;
