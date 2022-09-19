@@ -346,11 +346,13 @@ int GameScene(){
     int setcardkind = 0;    //置かれたカードの種類
     int setcardnum = 0;     //置かれたカードの数字
     int MouseX,MouseY;  //マウスの座標
-    int firstcardnum;   //一枚目にめくったカードの数字
-    int secondcardnum;  //二枚目にめくったカードの数字
-    int cardX,cardY;    //めくるカードの座標
+    int cardX,cardY;    //めくるカードの列と行
+    int card1X,card1Y,card2X,card2Y;;  //めくったカードの列と行
+    int card1num,card2num;   //めくったカードの数字
     int MouseInput;     //マウスの入力
     int opencard = 0;   //開かれたカードの数
+    int clear = 0;  //開いているカードの数
+
     //初期配置
     while(CheckHitKey( KEY_INPUT_SPACE)  == 0 ){
         for(int i = 0; i < 4; i++){
@@ -392,48 +394,68 @@ int GameScene(){
     }
 
 */
-   
 
-    //クリックでカードを開く
+    while(clear != 52){
 
-    while(opencard != 2){
-        GetMousePoint( &MouseX , &MouseY ); //マウスの位置を取得
-        MouseInput = GetMouseInput() ;      //カードのボタン状態を取得
-        cardX = (MouseX-CARDFIRST)/CARDWID; //カードの列を指定
-        cardY = (MouseY-CARDLEN)/CARDLEN;   //カードの行を指定
+        while(opencard != 2){
+            GetMousePoint( &MouseX , &MouseY ); //マウスの位置を取得
+            MouseInput = GetMouseInput() ;      //カードのボタン状態を取得
+            cardX = (MouseX-CARDFIRST)/CARDWID; //カードの列を指定
+            cardY = (MouseY-CARDLEN)/CARDLEN;   //カードの行を指定
 
-        //デバッグ
-        //DrawFormatString( 30, 40 , GetColor(255,255,255), "cardX=%d cardY=%d", cardX ,cardY );
-        //DrawFormatString( 30, 70 , GetColor(255,255,255), "setcardkind=%d setcardnum=%d", setcardkind,setcardnum );
+            //デバッグ
+            //DrawFormatString( 30, 40 , GetColor(255,255,255), "cardX=%d cardY=%d", cardX ,cardY );
+            //DrawFormatString( 30, 70 , GetColor(255,255,255), "setcardkind=%d setcardnum=%d", setcardkind,setcardnum );
 
-        if(cardX<0 || cardX>12 || cardY<0 || cardY>3 || MouseX<CARDFIRST || MouseY < CARDLEN ){ //カードがないところでボタンを押しても何も起こらない
-            continue;
-        }else {
-            setcardkind = (setcard[cardY][cardX]-1) / 13;
-            setcardnum = setcard[cardY][cardX] % 13 + 1 ;
+            if(cardX<0 || cardX>12 || cardY<0 || cardY>3 || MouseX<CARDFIRST || MouseY < CARDLEN ){ //カードがないところでボタンを押しても何も起こらない
+                continue;
+            }else {
+                setcardkind = (setcard[cardY][cardX]-1) / 13;
+                setcardnum = setcard[cardY][cardX] % 13 + 1 ;
+            }
+
+            //一枚目を開く
+            if( ( MouseInput & MOUSE_INPUT_LEFT ) != 0 && opencard ==0){
+                DrawGraph(CARDWID*cardX+CARDFIRST,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
+                card1num = setcardnum;
+                card1X = cardX;
+                card1Y = cardY;
+                opencard = 1;
+            }
+            //二枚目も開く
+            if( ( MouseInput & MOUSE_INPUT_RIGHT ) != 0 && opencard == 1){
+                DrawGraph(CARDWID*cardX+CARDFIRST,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
+                card2num = setcardnum;
+                card2X = cardX;
+                card2Y = cardY;
+                opencard = 2;
+            }
         }
 
-        //一枚目を開く
-        if( ( MouseInput & MOUSE_INPUT_LEFT ) != 0 ){
-            DrawGraph(CARDWID*cardX+CARDFIRST,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
-            opencard = 1;
+        WaitTimer(1000);
+
+
+        //同じだったらそのまま
+        if(card1num == card2num) {
+            opencard = 0;
+            clear += 2;
+        } 
+        //違ったら閉じる
+        else {
+            DrawGraph(CARDWID*card1X+CARDFIRST,CARDLEN*card1Y+CARDLEN,picHandleset(4,0),false);
+            DrawGraph(CARDWID*card2X+CARDFIRST,CARDLEN*card2Y+CARDLEN,picHandleset(4,0),false);
+            opencard = 0;
+
         }
-        //二枚目も開く
-        if( ( MouseInput & MOUSE_INPUT_RIGHT ) != 0 && opencard == 1){
-            DrawGraph(CARDWID*cardX+CARDFIRST,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
-            opencard = 2;
-        }
+
+        WaitTimer(300);
+
+        //途中終了
+        if(CheckHitKey( KEY_INPUT_ESCAPE )  != 0 ) return 0;
+        
     }
-    WaitTimer(300);
-
-    //同じだったら消える
-
-    //違ったら閉じる
-
-    //全部消えたらクリア
-    //return 1;
-    
-    return 0;
+    //クリアした場合
+    return 1;
 }
 
 void ClearScene(){
