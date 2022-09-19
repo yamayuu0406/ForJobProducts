@@ -345,7 +345,10 @@ int GameScene(){
     int setcardkind = 0;    //置かれたカードの種類
     int setcardnum = 0;     //置かれたカードの数字
     int MouseX,MouseY;  //マウスの座標
-
+    int firstcardnum;   //一枚目にめくったカードの数字
+    int secondcardnum;  //二枚目にめくったカードの数字
+    int cardX,cardY;    //めくるカードの座標
+    int MouseInput; //マウスの入力
     //初期配置
     while(CheckHitKey( KEY_INPUT_SPACE)  == 0 ){
         for(int i = 0; i < 4; i++){
@@ -358,7 +361,8 @@ int GameScene(){
     //ゲーム初期設定
     GameInit(setcard); 
 
-/*デバッグ
+//デバッグ
+/*
     //カードを全て裏返す    
     WaitTimer(2000);
     ClearDrawScreen();
@@ -375,13 +379,63 @@ int GameScene(){
 
         }
     }
-デバッグ*/
+*/
+//デバッグ
 
     //クリックでカードを開く
-    //マウスの位置を取得
-    GetMousePoint( &MouseX , &MouseY );
+    
+    do{
+        GetMousePoint( &MouseX , &MouseY ); //マウスの位置を取得
+        cardX = (MouseX-42.4)/CARDWID;      //カードの列を指定
+        cardY = (MouseY-CARDLEN)/CARDLEN;   //カードの行を指定
+
+        //デバッグ
+        //DrawFormatString( 30, 40 , GetColor(255,255,255), "cardX=%d cardY=%d", cardX ,cardY );
+        //DrawFormatString( 30, 70 , GetColor(255,255,255), "setcardkind=%d setcardnum=%d", setcardkind,setcardnum );
+
+        if(cardX<0 || cardX>12 || cardY<0 || cardY>3){
+            setcardkind = 4; setcardnum =0;
+        }else {
+            setcardkind = (setcard[cardY][cardX]-1) / 13;
+            setcardnum = setcard[cardY][cardX] % 13 + 1 ;
+        }
+
+        MouseInput = GetMouseInput() ;
+    }while( ( MouseInput && MOUSE_INPUT_LEFT ) == 0 );
+    
+    DrawGraph(CARDWID*cardX+42.5,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
+    
+    while(CheckHitKey( KEY_INPUT_SPACE )  == 0 ){
+        
+    }
 
     //二枚目も開く
+
+    do{
+        GetMousePoint( &MouseX , &MouseY ); //マウスの位置を取得
+        cardX = (MouseX-42.4)/CARDWID;      //カードの列を指定
+        cardY = (MouseY-CARDLEN)/CARDLEN;   //カードの行を指定
+
+        //デバッグ
+        //DrawFormatString( 30, 40 , GetColor(255,255,255), "cardX=%d cardY=%d", cardX ,cardY );
+        //DrawFormatString( 30, 70 , GetColor(255,255,255), "setcardkind=%d setcardnum=%d", setcardkind,setcardnum );
+
+        if(cardX<0 || cardX>12 || cardY<0 || cardY>3){
+            setcardkind = 4; setcardnum =0;
+        }else {
+            setcardkind = (setcard[cardY][cardX]-1) / 13;
+            setcardnum = setcard[cardY][cardX] % 13 + 1 ;
+        }
+
+        MouseInput = GetMouseInput() ;
+    }while( ( MouseInput && MOUSE_INPUT_LEFT ) == 0 );
+
+    DrawGraph(CARDWID*cardX+42.5,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
+
+     while(CheckHitKey( KEY_INPUT_SPACE )  == 0 ){
+        
+    }
+
 
     //同じだったら消える
 
