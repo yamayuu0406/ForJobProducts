@@ -3,14 +3,14 @@
 
 //数値定義
 
-#define WID 1200
-#define LEN 720
-#define CHARBIG 100
-#define CHARSMALL 50
-#define CHARDEPTH 5
-#define CARDWID 85
-#define CARDLEN 125
-#define CARDFIRST 42.5
+#define WID 1200        //画面サイズ横
+#define LEN 720         //画面サイズ縦
+#define CHARBIG 100     //大きい文字サイズ
+#define CHARSMALL 50    //小さい文字サイズ
+#define CHARDEPTH 5     //文字太さ
+#define CARDWID 85      //カードサイズ横
+#define CARDLEN 125     //カードサイズ縦
+#define CARDFIRST 42.5  //カードを置く初めの位置
 
 //Dxlib初期設定
 int Dxlib_Start(){
@@ -33,9 +33,9 @@ int Dxlib_Start(){
 
 //文字データセット
 int Handleset(int font){
-    static int TitleFontHandle = CreateFontToHandle( NULL , CHARBIG, CHARDEPTH ,DX_FONTTYPE_ANTIALIASING_EDGE_8X8);
-    static int TitleSubFontHandle = CreateFontToHandle( NULL , CHARSMALL , CHARDEPTH ,DX_FONTTYPE_ANTIALIASING_EDGE_8X8);
-    switch(font){
+    static int TitleFontHandle = CreateFontToHandle( NULL , CHARBIG, CHARDEPTH ,DX_FONTTYPE_ANTIALIASING_EDGE_8X8);         //タイトル画面大きい文字フォント
+    static int TitleSubFontHandle = CreateFontToHandle( NULL , CHARSMALL , CHARDEPTH ,DX_FONTTYPE_ANTIALIASING_EDGE_8X8);   //タイトル画面小さい文字フォント
+    switch(font){   //指定された文字フォントを返す
         case 1:
             return TitleFontHandle;
             break;
@@ -45,7 +45,7 @@ int Handleset(int font){
         default:
             break;
     }
-    return TitleFontHandle;
+    return 0;
 }
 
 //画像データセット
@@ -310,15 +310,17 @@ int TitleScene(){
         ClearDrawScreen();
     }
 
-    return select;
+    return select;  //選択したモードが返り値
 }
 
 //遊び方画面
 void HowToPlayScene(){
-    while(CheckHitKey( KEY_INPUT_SPACE ) == 0 ){
+    while(CheckHitKey( KEY_INPUT_ESCAPE ) == 0 ){
         DrawStringToHandle( WID/2-CHARBIG*1.5 , LEN/6 , "遊び方" , GetColor(0,255,255) ,Handleset(1) );
-        DrawStringToHandle( WID/2-CHARBIG*1 , LEN/6*3 , "割愛" , GetColor(0,255,255) ,Handleset(1) );
-        DrawStringToHandle( WID/2-CHARSMALL*6 , LEN/6*4 , "スペースでゲームスタート" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*7 , LEN/6*2 , "まずはスペースキーを一回押す" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*9.5 , LEN/6*3 , "一枚目が左クリック、二枚目が右クリック" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*6 , LEN/6*4 , "終わるときはESCAPEを押す" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*6 , LEN/6*5, "ESCAPEでゲームスタート" , GetColor(0,255,255) ,Handleset(2) );
     }
     ClearDrawScreen();
 }
@@ -344,15 +346,17 @@ int GameScene(){
     //カードを設定する 
     int setcard[4][13] = {0};  //1～53の数字が入る
     int setcardkind = 0;    //置かれたカードの種類
-    int setcardnum = 0;     //置かれたカードの数字
+    int setcardnum = 0;     //置かれたカードの数字(1～13)
     int MouseX,MouseY;  //マウスの座標
     int cardX,cardY;    //めくるカードの列と行
     int card1X,card1Y,card2X,card2Y;;  //めくったカードの列と行
     int card1num,card2num;   //めくったカードの数字
+    int card1off,card2off;     //めくったカードの数字(1～52)
     int MouseInput;     //マウスの入力
     int opencard = 0;   //開かれたカードの数
     int clear = 0;  //開いているカードの数
-
+    int move = 0;   //手数表示
+    int offsetcard[53] = {0}; //既に開かれている場合1が入る
     //初期配置
     while(CheckHitKey( KEY_INPUT_SPACE)  == 0 ){
         for(int i = 0; i < 4; i++){
@@ -365,36 +369,6 @@ int GameScene(){
     //ゲーム初期設定
     GameInit(setcard); 
 
-//デバッグ
-/*
-    //カードを全て裏返す    
-    WaitTimer(2000);
-    ClearDrawScreen();
-
-    while(CheckHitKey( KEY_INPUT_SPACE )  == 0 ){
-        for(int i = 0; i < 4; i++){
-            for(int j = 0; j < 13; j++){
-                setcardkind = (setcard[i][j]-1) / 13;   //1～13が０でクラブ 14～26が１でダイア・・・
-                setcardnum = setcard[i][j] % 13 + 1 ;    //ダイアのAなら14-13で１が出る
-                DrawGraph(CARDWID*j+CARDFIRST,CARDLEN*i+CARDLEN,picHandleset(setcardkind,setcardnum),false);
-                //DrawFormatString( 300*i, 40 * j, GetColor(255,255,255), "setcardnum=%d", setcardnum );
-
-                while(CheckHitKey( KEY_INPUT_RETURN )  == 0 ){
-                    GetMousePoint( &MouseX , &MouseY ); //マウスの位置を取得
-                    cardX = (MouseX-CARDFIRST)/CARDWID;      //カードの列を指定
-                    cardY = (MouseY-CARDLEN)/CARDLEN;   //カードの行を指定
-                    DrawFormatString( 30, 40 , GetColor(255,255,255), "cardX=%d cardY=%d", cardX ,cardY );
-                    DrawFormatString( 30, 80 , GetColor(255,255,255), "MouseX=%d MouseY=%d", MouseX ,MouseY );
-                    WaitTimer(300);
-                    ClearDrawScreen();
-                }
-            }
-
-        }
-    }
-
-*/
-
     while(clear != 52){
 
         while(opencard != 2){
@@ -403,9 +377,8 @@ int GameScene(){
             cardX = (MouseX-CARDFIRST)/CARDWID; //カードの列を指定
             cardY = (MouseY-CARDLEN)/CARDLEN;   //カードの行を指定
 
-            //デバッグ
-            //DrawFormatString( 30, 40 , GetColor(255,255,255), "cardX=%d cardY=%d", cardX ,cardY );
-            //DrawFormatString( 30, 70 , GetColor(255,255,255), "setcardkind=%d setcardnum=%d", setcardkind,setcardnum );
+            //途中終了
+            if(CheckHitKey( KEY_INPUT_ESCAPE )  != 0 ) return 0;
 
             if(cardX<0 || cardX>12 || cardY<0 || cardY>3 || MouseX<CARDFIRST || MouseY < CARDLEN ){ //カードがないところでボタンを押しても何も起こらない
                 continue;
@@ -415,19 +388,21 @@ int GameScene(){
             }
 
             //一枚目を開く
-            if( ( MouseInput & MOUSE_INPUT_LEFT ) != 0 && opencard ==0){
+            if( ( MouseInput & MOUSE_INPUT_LEFT ) != 0 && opencard == 0 && offsetcard[setcard[cardY][cardX]] == 0){
                 DrawGraph(CARDWID*cardX+CARDFIRST,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
                 card1num = setcardnum;
                 card1X = cardX;
                 card1Y = cardY;
+                card1off = setcard[cardY][cardX];
                 opencard = 1;
             }
             //二枚目も開く
-            if( ( MouseInput & MOUSE_INPUT_RIGHT ) != 0 && opencard == 1 && !((cardX==card1X)&&(cardY==card1Y)) ){
+            if( ( MouseInput & MOUSE_INPUT_RIGHT ) != 0 && opencard == 1 && !((cardX==card1X)&&(cardY==card1Y)) && offsetcard[setcard[cardY][cardX]] == 0){
                 DrawGraph(CARDWID*cardX+CARDFIRST,CARDLEN*cardY+CARDLEN,picHandleset(setcardkind,setcardnum),false);
                 card2num = setcardnum;
                 card2X = cardX;
                 card2Y = cardY;
+                card2off = setcard[cardY][cardX];
                 opencard = 2;
             }
         }
@@ -438,7 +413,9 @@ int GameScene(){
         //同じだったらそのまま
         if(card1num == card2num) {
             opencard = 0;
-            clear += 2;
+            clear += 2;     //二枚めくれたまま
+            offsetcard[card1off] = 1;       //めくれたカードを動かせなくする
+            offsetcard[card2off] = 1;
         } 
         //違ったら閉じる
         else {
@@ -447,11 +424,9 @@ int GameScene(){
             opencard = 0;
 
         }
-
+        
         WaitTimer(300);
 
-        //途中終了
-        if(CheckHitKey( KEY_INPUT_ESCAPE )  != 0 ) return 0;
         
     }
     //クリアした場合
@@ -487,8 +462,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
     if(result) ClearScene();
 
-	WaitKey() ;				// キー入力待ち
-    
     //Dxlib終了
     Dxlib_Finish();
     return 0;
