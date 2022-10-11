@@ -342,7 +342,6 @@ void GameInit(int setcard[4][13]){
 
 //ゲーム画面
 int GameScene(){
-
     //カードを設定する 
     int setcard[4][13] = {0};  //1～53の数字が入る
     int setcardkind = 0;    //置かれたカードの種類
@@ -433,10 +432,16 @@ int GameScene(){
     return 1;
 }
 
-void ClearScene(){
-    //クリア画面
+//クリア画面
+void ClearScene(){   
+    while(CheckHitKey( KEY_INPUT_ESCAPE ) == 0 ){
+        DrawStringToHandle( WID/2-CHARBIG*1.5 , LEN/6 , "クリア！" , GetColor(0,0,0) ,Handleset(1) );
+        DrawStringToHandle( WID/2-CHARSMALL*4.5 , LEN/6*2 , "クリアおめでとう！" , GetColor(0,0,0) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*3 , LEN/6*3 , "結果　52点！" , GetColor(0,0,0) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*6 , LEN/6*4 , "終わるときはESCAPEを押す" , GetColor(0,0,0) ,Handleset(2) );
+    }
+    ClearDrawScreen();
 }
-
 //Dxlib終了
 int Dxlib_Finish(){
     DxLib_End() ;				// ＤＸライブラリ使用の終了処理
