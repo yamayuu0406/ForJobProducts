@@ -297,9 +297,9 @@ int TitleScene(){
         if(CheckHitKey(KEY_INPUT_DOWN)){ select = 1 ;}
         
         //画面表示
-        DrawStringToHandle( WID/2-CHARBIG*2 , LEN/6 , "神経衰弱" , GetColor(0,255,255) ,Handleset(1) );
-        DrawStringToHandle( WID/2-CHARSMALL*2, LEN/6*3 , "スタート" , GetColor(0,255,255) ,Handleset(2) );
-        DrawStringToHandle( WID/2-CHARSMALL*1.5, LEN/6*4 , "遊び方" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARBIG*3 , LEN/6 , "Concentration" , GetColor(0,255,255) ,Handleset(1) );
+        DrawStringToHandle( WID/2-CHARSMALL*2, LEN/6*3 , "Start" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*2, LEN/6*4 , "How to play" , GetColor(0,255,255) ,Handleset(2) );
         
         if(select % 2 == 0){
             DrawCircle( WID/2-CHARSMALL*2.5 , LEN/6*3 + CHARSMALL/2  ,  10 , GetColor(255,0,0), true );
@@ -316,11 +316,12 @@ int TitleScene(){
 //遊び方画面
 void HowToPlayScene(){
     while(CheckHitKey( KEY_INPUT_ESCAPE ) == 0 ){
-        DrawStringToHandle( WID/2-CHARBIG*1.5 , LEN/6 , "遊び方" , GetColor(0,255,255) ,Handleset(1) );
-        DrawStringToHandle( WID/2-CHARSMALL*7 , LEN/6*2 , "まずはスペースキーを一回押す" , GetColor(0,255,255) ,Handleset(2) );
-        DrawStringToHandle( WID/2-CHARSMALL*9.5 , LEN/6*3 , "一枚目が左クリック、二枚目が右クリック" , GetColor(0,255,255) ,Handleset(2) );
-        DrawStringToHandle( WID/2-CHARSMALL*6 , LEN/6*4 , "終わるときはESCAPEを押す" , GetColor(0,255,255) ,Handleset(2) );
-        DrawStringToHandle( WID/2-CHARSMALL*6 , LEN/6*5, "ESCAPEでゲームスタート" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARBIG*2 , LEN/6 , "How to play" , GetColor(0,255,255) ,Handleset(1) );
+        DrawStringToHandle( WID/2-CHARSMALL*4.75 , LEN/6*2.5 , "Space Key -> Start" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*7.25 , LEN/6*3 , "1, Left Click -> The 1st one" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*7.5 , LEN/6*3.5 , "2, Right Click -> The 2st one" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*4.5 , LEN/6*4 , "Escape Key -> End" , GetColor(0,255,255) ,Handleset(2) );
+        DrawStringToHandle( WID/2-CHARSMALL*8.25 , LEN/6*5, "Press Escape Key! -> GAME START!" , GetColor(0,255,255) ,Handleset(2) );
     }
     ClearDrawScreen();
 }
@@ -342,6 +343,7 @@ void GameInit(int setcard[4][13]){
 
 //ゲーム画面
 int GameScene(){
+
     //カードを設定する 
     int setcard[4][13] = {0};  //1～53の数字が入る
     int setcardkind = 0;    //置かれたカードの種類
@@ -432,16 +434,10 @@ int GameScene(){
     return 1;
 }
 
-//クリア画面
-void ClearScene(){   
-    while(CheckHitKey( KEY_INPUT_ESCAPE ) == 0 ){
-        DrawStringToHandle( WID/2-CHARBIG*1.5 , LEN/6 , "クリア！" , GetColor(0,0,0) ,Handleset(1) );
-        DrawStringToHandle( WID/2-CHARSMALL*4.5 , LEN/6*2 , "クリアおめでとう！" , GetColor(0,0,0) ,Handleset(2) );
-        DrawStringToHandle( WID/2-CHARSMALL*3 , LEN/6*3 , "結果　52点！" , GetColor(0,0,0) ,Handleset(2) );
-        DrawStringToHandle( WID/2-CHARSMALL*6 , LEN/6*4 , "終わるときはESCAPEを押す" , GetColor(0,0,0) ,Handleset(2) );
-    }
-    ClearDrawScreen();
+void ClearScene(){
+    //クリア画面
 }
+
 //Dxlib終了
 int Dxlib_Finish(){
     DxLib_End() ;				// ＤＸライブラリ使用の終了処理
